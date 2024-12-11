@@ -8,6 +8,8 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+// ユーザ認証用。JWTトークンの生成と検証を行う。
+// CreateToken は、与えられたペイロードを使用してトークンを生成し、トークンを文字列として返します。
 func CreateToken(ttl time.Duration, payload interface{}, privateKey string) (string, error) {
 	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
@@ -36,6 +38,7 @@ func CreateToken(ttl time.Duration, payload interface{}, privateKey string) (str
 	return token, nil
 }
 
+// ValidateToken は、与えられたトークンを検証し、ペイロードを返します。
 func ValidateToken(token string, publicKey string) (interface{}, error) {
 	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey)
 	if err != nil {

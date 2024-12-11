@@ -2,10 +2,11 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/controllers"
-	"github.com/wpcodevo/golang-gorm-postgres/middleware"
+	"github.com/mofukuma/golang-gorm-postgres/controllers"
+	"github.com/mofukuma/golang-gorm-postgres/middleware"
 )
 
+// UserRouteController は、ユーザに関連するルート
 type UserRouteController struct {
 	userController controllers.UserController
 }

@@ -2,11 +2,24 @@ services:
   postgres:
     image: postgres
     container_name: postgres
-    ports:
+    expose:
       - 6500:5432
     env_file:
       - ./app.env
     volumes:
       - postgres:/var/lib/postgresql/data
+  golang:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: golang
+    ports:
+      - 6501:6501
+    env_file:
+      - ./app.env
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
 volumes:
   postgres:

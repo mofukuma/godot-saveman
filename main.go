@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/controllers"
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
-	"github.com/wpcodevo/golang-gorm-postgres/routes"
+	"github.com/mofukuma/golang-gorm-postgres/controllers"
+	"github.com/mofukuma/golang-gorm-postgres/initializers"
+	"github.com/mofukuma/golang-gorm-postgres/routes"
 )
 
 var (
@@ -55,7 +55,7 @@ func main() {
 
 	server.Use(cors.New(corsConfig))
 
-	router := server.Group("/api")
+	router := server.Group("/")
 	router.GET("/healthchecker", func(ctx *gin.Context) {
 		message := "Welcome to Golang with Gorm and Postgres"
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})

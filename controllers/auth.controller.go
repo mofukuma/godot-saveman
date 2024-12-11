@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/wpcodevo/golang-gorm-postgres/initializers"
-	"github.com/wpcodevo/golang-gorm-postgres/models"
-	"github.com/wpcodevo/golang-gorm-postgres/utils"
+	"github.com/mofukuma/golang-gorm-postgres/initializers"
+	"github.com/mofukuma/golang-gorm-postgres/models"
+	"github.com/mofukuma/golang-gorm-postgres/utils"
 	"gorm.io/gorm"
 )
 
@@ -22,6 +22,19 @@ func NewAuthController(DB *gorm.DB) AuthController {
 }
 
 // SignUp User
+// @Description ユーザ登録
+// @Accept json
+// @Produce json
+// @Param name body string true "Name"
+// @Param email body string true "Email"
+// @Param password body string true "Password"
+// @Param passwordConfirm body string true "Password Confirm"
+// @Param photo body string true "Photo"
+// @Success 201 {object} models.UserResponse
+// @Failure 400 {object} string
+// @Failure 409 {object} string
+// @Failure 502 {object} string
+// @Router /auth/register [post]
 func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	var payload *models.SignUpInput
 
@@ -42,6 +55,7 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	}
 
 	now := time.Now()
+	//ユーザデータを作成
 	newUser := models.User{
 		Name:      payload.Name,
 		Email:     strings.ToLower(payload.Email),
@@ -57,7 +71,7 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	result := ac.DB.Create(&newUser)
 
 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
-		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User with that email already exists"})
+		ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "User already exists"})
 		return
 	} else if result.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": "Something bad happened"})
@@ -65,18 +79,29 @@ func (ac *AuthController) SignUpUser(ctx *gin.Context) {
 	}
 
 	userResponse := &models.UserResponse{
-		ID:        newUser.ID,
-		Name:      newUser.Name,
-		Email:     newUser.Email,
-		Photo:     newUser.Photo,
-		Role:      newUser.Role,
-		Provider:  newUser.Provider,
+		//ID:     newUser.ID,
+		Name:   newUser.Name,
+		Userid: newUser.Userid,
+		//Email:     newUser.Email,
+		//Photo:     newUser.Photo,
+		//Role:      newUser.Role,
+		//Provider:  newUser.Provider,
 		CreatedAt: newUser.CreatedAt,
 		UpdatedAt: newUser.UpdatedAt,
 	}
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": gin.H{"user": userResponse}})
 }
 
+// SignIn User
+// @Description ユーザログイン
+// @Accept json
+// @Produce json
+// @Param userid body string true "Userid"
+// @Param password body string true "Password"
+// @Success 200 {object} string
+// @Failure 400 {object} string
+// @Failure 502 {object} string
+// @Router /auth/login [post]
 func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	var payload *models.SignInInput
 
@@ -86,14 +111,14 @@ func (ac *AuthController) SignInUser(ctx *gin.Context) {
 	}
 
 	var user models.User
-	result := ac.DB.First(&user, "email = ?", strings.ToLower(payload.Email))
+	result := ac.DB.First(&user, "userid = ?", strings.ToLower(payload.Userid))
 	if result.Error != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email or Password"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid UserId or Password"})
 		return
 	}
 
 	if err := utils.VerifyPassword(user.Password, payload.Password); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email or Password"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid UserId or Password"})
 		return
 	}
 
@@ -139,7 +164,7 @@ func (ac *AuthController) RefreshAccessToken(ctx *gin.Context) {
 	}
 
 	var user models.User
-	result := ac.DB.First(&user, "id = ?", fmt.Sprint(sub))
+	result := ac.DB.First(&user, "userid = ?", fmt.Sprint(sub))
 	if result.Error != nil {
 		ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"status": "fail", "message": "the user belonging to this token no logger exists"})
 		return
