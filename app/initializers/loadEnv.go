@@ -27,17 +27,28 @@ type Config struct {
 }
 
 func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigType("env")
-	viper.SetConfigName("app")
-
 	viper.AutomaticEnv()
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
-	}
+	viper.BindEnv("POSTGRES_HOST")
+	viper.BindEnv("POSTGRES_USER")
+	viper.BindEnv("POSTGRES_PASSWORD")
+	viper.BindEnv("POSTGRES_DB")
+	viper.BindEnv("POSTGRES_PORT")
+	viper.BindEnv("PORT")
+	viper.BindEnv("CLIENT_ORIGIN")
+	viper.BindEnv("ACCESS_TOKEN_PRIVATE_KEY")
+	viper.BindEnv("ACCESS_TOKEN_PUBLIC_KEY")
+	viper.BindEnv("REFRESH_TOKEN_PRIVATE_KEY")
+	viper.BindEnv("REFRESH_TOKEN_PUBLIC_KEY")
+	viper.BindEnv("ACCESS_TOKEN_EXPIRED_IN")
+	viper.BindEnv("REFRESH_TOKEN_EXPIRED_IN")
+	viper.BindEnv("ACCESS_TOKEN_MAXAGE")
+	viper.BindEnv("REFRESH_TOKEN_MAXAGE")
 
 	err = viper.Unmarshal(&config)
-	return
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
 }

@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/mofukuma/golang-gorm-postgres/controllers"
-	"github.com/mofukuma/golang-gorm-postgres/middleware"
+	//"github.com/mofukuma/golang-gorm-postgres/middleware" //ログインチェック
 )
 
 // PostRouteController は、投稿に関連するルート
