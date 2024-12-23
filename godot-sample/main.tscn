@@ -1,0 +1,132 @@
+[gd_scene load_steps=3 format=3 uid="uid://dcouple3g251f"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_351t8"]
+[ext_resource type="Script" path="res://save_man.gd" id="2_qd1y4"]
+
+[node name="TestMainScene" type="Node2D"]
+script = ExtResource("1_351t8")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Panel" type="Panel" parent="Control"]
+layout_mode = 0
+offset_right = 973.0
+offset_bottom = 456.0
+
+[node name="Userid" type="LineEdit" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 67.0
+offset_top = 95.0
+offset_right = 147.0
+offset_bottom = 126.0
+text = "user1"
+placeholder_text = "Userid"
+
+[node name="Pass" type="LineEdit" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 162.0
+offset_top = 95.0
+offset_right = 251.0
+offset_bottom = 126.0
+text = "pass1234"
+placeholder_text = "Password"
+
+[node name="Createuser" type="Button" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 269.0
+offset_top = 96.0
+offset_right = 341.0
+offset_bottom = 127.0
+text = "新規作成"
+
+[node name="Login" type="Button" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 366.0
+offset_top = 96.0
+offset_right = 438.0
+offset_bottom = 127.0
+text = "ログイン"
+
+[node name="Value" type="LineEdit" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 387.0
+offset_top = 288.0
+offset_right = 476.0
+offset_bottom = 319.0
+text = "9999"
+placeholder_text = "Value"
+
+[node name="Key" type="LineEdit" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 285.0
+offset_top = 288.0
+offset_right = 374.0
+offset_bottom = 319.0
+text = "lv"
+placeholder_text = "Key"
+
+[node name="Documentid" type="LineEdit" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 186.0
+offset_top = 289.0
+offset_right = 266.0
+offset_bottom = 320.0
+text = "user1"
+placeholder_text = "Userid"
+
+[node name="Load" type="Button" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 608.0
+offset_top = 287.0
+offset_right = 680.0
+offset_bottom = 318.0
+text = "ロード"
+
+[node name="Save" type="Button" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 516.0
+offset_top = 288.0
+offset_right = 588.0
+offset_bottom = 319.0
+text = "セーブ"
+
+[node name="Kekka" type="RichTextLabel" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 575.0
+offset_top = 45.0
+offset_right = 891.0
+offset_bottom = 241.0
+bbcode_enabled = true
+text = "結果とか"
+
+[node name="Server" type="Button" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 783.0
+offset_top = 277.0
+offset_right = 958.0
+offset_bottom = 341.0
+text = "サーバになる
+（どっちかが最初に押す）"
+
+[node name="Client" type="Button" parent="Control/Panel"]
+layout_mode = 0
+offset_left = 775.0
+offset_top = 362.0
+offset_right = 950.0
+offset_bottom = 426.0
+text = "サーバに接続"
+
+[node name="SaveMan" type="Node" parent="."]
+script = ExtResource("2_qd1y4")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="SaveMan"]
+
+[connection signal="pressed" from="Control/Panel/Createuser" to="." method="_on_createuser_pressed"]
+[connection signal="pressed" from="Control/Panel/Load" to="." method="_on_load_pressed"]
+[connection signal="pressed" from="Control/Panel/Save" to="." method="_on_save_pressed"]
+[connection signal="pressed" from="Control/Panel/Server" to="." method="_on_room_pressed"]
+[connection signal="pressed" from="Control/Panel/Client" to="." method="_on_client_pressed"]

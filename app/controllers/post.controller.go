@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
 	//"time"
@@ -38,21 +37,19 @@ func (pc *PostController) CreatePost(ctx *gin.Context) {
 	result := pc.DB.Create(&newPost)
 	if result.Error != nil {
 		if strings.Contains(result.Error.Error(), "duplicate key") {
-			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "Post with that title already exists"})
+			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "already exists"})
 			return
 		}
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newPost})
+	ctx.JSON(http.StatusCreated, gin.H{"status": "ok"})
 }
 
 func (pc *PostController) UpdatePost(ctx *gin.Context) {
 	postId := ctx.Param("userid")
 	key := ctx.Param("k")
-
-	//currentUser := ctx.MustGet("currentUser").(models.User)
 
 	var payload *models.CreatePostRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -62,7 +59,7 @@ func (pc *PostController) UpdatePost(ctx *gin.Context) {
 	var updatedPost models.Post
 	result := pc.DB.First(&updatedPost, "userid = ? and k = ?", postId, key)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not exists"})
 		return
 	}
 	postToUpdate := models.Post{
@@ -73,7 +70,7 @@ func (pc *PostController) UpdatePost(ctx *gin.Context) {
 
 	pc.DB.Model(&updatedPost).Updates(postToUpdate)
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": updatedPost})
+	ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
 func (pc *PostController) UpsertPost(ctx *gin.Context) {
@@ -101,7 +98,7 @@ func (pc *PostController) UpsertPost(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newPost})
+		ctx.JSON(http.StatusCreated, gin.H{"status": "ok"})
 	} else {
 		// 投稿が存在する場合は更新
 		existingPost.V = payload.V
@@ -112,7 +109,7 @@ func (pc *PostController) UpsertPost(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": existingPost})
+		ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
 	}
 }
 
@@ -122,29 +119,29 @@ func (pc *PostController) FindByUserId(ctx *gin.Context) {
 	var post models.Post
 	result := pc.DB.First(&post, "userid = ?", postId)
 	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No post with that title exists"})
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not exists"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": post})
+	ctx.JSON(http.StatusOK, gin.H{"data": post})
 }
 
 func (pc *PostController) FindPosts(ctx *gin.Context) {
-	var page = ctx.DefaultQuery("page", "1")
-	var limit = ctx.DefaultQuery("limit", "10")
+	var payload *models.GetPostRequest
 
-	intPage, _ := strconv.Atoi(page)
-	intLimit, _ := strconv.Atoi(limit)
-	offset := (intPage - 1) * intLimit
-
-	var posts []models.Post
-	results := pc.DB.Limit(intLimit).Offset(offset).Find(&posts)
-	if results.Error != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(posts), "data": posts})
+	var post models.Post
+	result := pc.DB.First(&post, "userid = ? and k = ?", payload.Userid, payload.K)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "Not exists"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"userid": post.Userid, "k": post.K, "v": post.V})
 }
 
 func (pc *PostController) DeletePost(ctx *gin.Context) {
